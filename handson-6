@@ -1,0 +1,73 @@
+ 
+ import time 
+import random
+import matplotlib.pyplot as pltimport
+import sys
+# Increase recursion limit to handle large inputs
+sys.setrecursionlimit(10**6)
+
+# Non-random QuickSort (using the median-of-three pivot to improve efficiency)
+def quick_sort(lst):
+    if len(lst) <= 1:
+        return lst
+    pivot = lst[len(lst) // 2]  # Selecting the middle element as the pivot
+    smaller_section = [val for val in lst if val < pivot]
+    equal_section = [val for val in lst if val == pivot]
+    larger_section = [val for val in lst if val > pivot]
+    return quick_sort(smaller_section) + equal_section + quick_sort(larger_section)
+
+# Random pivot QuickSort
+def quick_sort_random(lst):
+    if len(lst) <= 1:
+        return lst
+    pivot_idx = random.randint(0, len(lst) - 1)
+    pivot = lst[pivot_idx]
+    smaller_section = [val for i, val in enumerate(lst) if val < pivot]
+    equal_section = [val for i, val in enumerate(lst) if val == pivot]
+    larger_section = [val for i, val in enumerate(lst) if val > pivot]
+    return quick_sort_random(smaller_section) + equal_section + quick_sort_random(larger_section)
+
+# Benchmarking function
+def measure_execution_time(sort_func, lst):
+    start = time.perf_counter()
+    sort_func(lst)
+    end = time.perf_counter()
+    return end - start
+
+# Generate test cases
+def generate_best_scenario(n):
+    return list(range(n))  # Already sorted input
+
+def generate_worst_scenario(n):
+    return list(range(n, 0, -1))  # Reverse sorted input
+
+def generate_average_scenario(n):
+    dataset = list(range(n))
+    random.shuffle(dataset)
+    return dataset
+
+sizes_list = [150, 600, 1200, 5500, 11000]  # Different input sizes
+best_case_times, worst_case_times, avg_case_times = [], [], []
+
+for size in sizes_list:
+    best_case_times.append(measure_execution_time(quick_sort, generate_best_scenario(size)))
+    worst_case_times.append(measure_execution_time(quick_sort, generate_worst_scenario(size)))
+    avg_case_times.append(measure_execution_time(quick_sort, generate_average_scenario(size)))
+
+# Plot the results
+plt.figure(figsize=(10, 5))
+plt.plot(sizes_list, best_case_times, label='Best Case', marker='o')
+plt.plot(sizes_list, worst_case_times, label='Worst Case', marker='o')
+plt.plot(sizes_list, avg_case_times, label='Average Case', marker='o')
+plt.xlabel('Input Size (n)')
+plt.ylabel('Execution Time (seconds)')
+plt.title('Performance Analysis of Non-Random QuickSort')
+plt.legend()
+plt.grid()
+plt.show()
+
+# Example usage
+if __name__ == "__main__":
+    sample_dataset = [26, 2, 18, 56, 1, 31]
+    print("QuickSort with median pivot:", quick_sort(sample_dataset))
+    print("QuickSort with random pivot:", quick_sort_random(sample_dataset))
